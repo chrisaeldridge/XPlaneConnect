@@ -56,24 +56,24 @@ namespace XPC
 		if (handlers.size() == 0)
 		{
 			Log::WriteLine(LOG_TRACE, "MSGH", "Initializing handlers");
-			// Common messages
-			handlers.insert(std::make_pair("CONN", MessageHandlers::HandleConn));
-			handlers.insert(std::make_pair("CTRL", MessageHandlers::HandleCtrl));
-			handlers.insert(std::make_pair("DATA", MessageHandlers::HandleData));
-			handlers.insert(std::make_pair("DREF", MessageHandlers::HandleDref));
-			handlers.insert(std::make_pair("GETD", MessageHandlers::HandleGetD));
-			handlers.insert(std::make_pair("POSI", MessageHandlers::HandlePosi));
-			handlers.insert(std::make_pair("POST", MessageHandlers::HandlePosT));
-			handlers.insert(std::make_pair("SIMU", MessageHandlers::HandleSimu));
-			handlers.insert(std::make_pair("TEXT", MessageHandlers::HandleText));
-			handlers.insert(std::make_pair("WYPT", MessageHandlers::HandleWypt));
-			handlers.insert(std::make_pair("VIEW", MessageHandlers::HandleView));
-			handlers.insert(std::make_pair("GETC", MessageHandlers::HandleGetC));
-			handlers.insert(std::make_pair("GETP", MessageHandlers::HandleGetP));
-			handlers.insert(std::make_pair("COMM", MessageHandlers::HandleComm));
-			handlers.insert(std::make_pair("GETT", MessageHandlers::HandleGetT));
-			handlers.insert(std::make_pair("BCOM", MessageHandlers::HandleBCom));
-			handlers.insert(std::make_pair("ECOM", MessageHandlers::HandleECom));
+			// Common messages														//name of calls on the sending application side
+			handlers.insert(std::make_pair("CONN", MessageHandlers::HandleConn));	//setCONN
+			handlers.insert(std::make_pair("CTRL", MessageHandlers::HandleCtrl));	//sendCTRL
+			handlers.insert(std::make_pair("DATA", MessageHandlers::HandleData));	//sendDATA
+			handlers.insert(std::make_pair("DREF", MessageHandlers::HandleDref));	//sendDREFs
+			handlers.insert(std::make_pair("GETD", MessageHandlers::HandleGetD));	//sendDREFRequest
+			handlers.insert(std::make_pair("POSI", MessageHandlers::HandlePosi));	//sendPOSI
+			handlers.insert(std::make_pair("POST", MessageHandlers::HandlePosT));	//sendPOST
+			handlers.insert(std::make_pair("SIMU", MessageHandlers::HandleSimu));	//pauseSim
+			handlers.insert(std::make_pair("TEXT", MessageHandlers::HandleText));	//sendTEXT
+			handlers.insert(std::make_pair("WYPT", MessageHandlers::HandleWypt));	//sendWYPT
+			handlers.insert(std::make_pair("VIEW", MessageHandlers::HandleView));	//sendVIEW
+			handlers.insert(std::make_pair("GETC", MessageHandlers::HandleGetC));	//getCTRL
+			handlers.insert(std::make_pair("GETP", MessageHandlers::HandleGetP));	//getPOSI
+			handlers.insert(std::make_pair("COMM", MessageHandlers::HandleComm));	//?
+			handlers.insert(std::make_pair("GETT", MessageHandlers::HandleGetT));	//sendTERRRequest
+			handlers.insert(std::make_pair("BCOM", MessageHandlers::HandleBCom));	//?
+			handlers.insert(std::make_pair("ECOM", MessageHandlers::HandleECom));	//?
 			// X-Plane data messages
 			handlers.insert(std::make_pair("DSEL", MessageHandlers::HandleXPlaneData));
 			handlers.insert(std::make_pair("USEL", MessageHandlers::HandleXPlaneData));
@@ -265,9 +265,12 @@ namespace XPC
 			}
 			DataManager::Set(DREF_ThrottleSet, throttleArray, 8, aircraftNumber);
 			DataManager::Set(DREF_ThrottleActual, throttleArray, 8, aircraftNumber);
+			DataManager::Set("sim/flightmodel/engine/ENGN_thro_use", throttleArray, 8);
 			if (aircraftNumber == 0)
 			{
 				DataManager::Set("sim/flightmodel/engine/ENGN_thro_override", throttleArray, 1);
+				DataManager::Set("sim/operation/override/override_throttles", throttleArray, 1);
+				
 			}
 		}
 		if (gear != -1)
